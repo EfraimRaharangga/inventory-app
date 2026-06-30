@@ -16,5 +16,9 @@ Route::get('/peminjaman', function () {
 })->name('peminjaman.index');
 
 Route::get('/user', function () {
-    return Inertia::render('DummyPage', ['title' => 'User Management']);
+    return Inertia::render('UserManagement', ['title' => 'User Management']);
 })->name('user.index');
+
+Route::get('/hotkeys', function () {
+    return Inertia::render('Hotkeys', ['title' => 'Hotkeys Reference']);
+})->name('hotkeys.index');

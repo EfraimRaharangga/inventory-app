@@ -40,18 +40,13 @@ export default function Dashboard({ stats, alerts, recentActivity }) {
     };
 
     return (
-        <MasterLayout>
+        <MasterLayout title="Dashboard">
             <FlashMessage message={flashMsg} onClose={() => setFlashMsg('')} />
             
-            <div className="mb-8 flex justify-between items-end border-b border-neutral-800 pb-4">
-                <div>
-                    <h1 className="font-mono text-2xl font-bold text-cyan-400 tracking-widest uppercase">
-                        Dashboard
-                    </h1>
-                    <p className="font-mono text-xs text-neutral-500 uppercase tracking-widest mt-1">
-                        System Overview & Diagnostics
-                    </p>
-                </div>
+            <div className="mb-6 flex justify-between items-end pb-4">
+                <p className="font-mono text-xs text-neutral-500 uppercase tracking-widest">
+                    System Overview & Diagnostics
+                </p>
                 <Button onClick={() => setIsModalOpen(true)}>
                     Run Diagnostics
                 </Button>
