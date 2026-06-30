@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Package, RefreshCcw, Users, Menu, X, Terminal, ChevronLeft, ChevronRight, Keyboard, Search, UserCircle, Bell } from 'lucide-react';
+import { LayoutDashboard, Package, RefreshCcw, Users, Menu, X, Terminal, ChevronLeft, ChevronRight, Keyboard, Search, UserCircle, Bell, LogOut } from 'lucide-react';
 import CommandPaletteMock from '@/Components/UI/CommandPaletteMock';
+import FlashMessage from '@/Components/UI/FlashMessage';
 
 export default function MasterLayout({ children, title }) {
-    const { url } = usePage();
+    const { url, props } = usePage();
+    const { auth, flash } = props;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
     const [showPalette, setShowPalette] = useState(false);
@@ -29,7 +31,7 @@ export default function MasterLayout({ children, title }) {
         {
             group: 'System Tools',
             items: [
-                { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+                { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
                 { name: 'Barang', href: '/barang', icon: Package },
                 { name: 'Peminjaman', href: '/peminjaman', icon: RefreshCcw },
             ]
@@ -48,17 +50,21 @@ export default function MasterLayout({ children, title }) {
         }
     ];
 
+    const flashMsg = flash?.error || flash?.success;
+    const flashType = flash?.error ? 'error' : 'success';
+
     return (
         <div className="min-h-screen bg-neutral-950 text-neutral-300 font-sans flex flex-col md:flex-row">
+            {flashMsg && <FlashMessage message={flashMsg} type={flashType} onClose={() => { }} />}
             <CommandPaletteMock show={showPalette} onClose={() => setShowPalette(false)} />
 
             {/* Mobile Header */}
             <div className="md:hidden flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-900 sticky top-0 z-30">
                 <div className="flex items-center space-x-2 text-cyan-400">
                     <Terminal size={24} />
-                    <span className="font-mono font-bold tracking-widest">INV_SYS</span>
+                    <span className="font-mono font-bold tracking-widest">Inventory App</span>
                 </div>
-                <button 
+                <button
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                     className="text-neutral-400 hover:text-cyan-400 transition-colors"
                 >
@@ -79,10 +85,10 @@ export default function MasterLayout({ children, title }) {
                         <div className={`p-6 border-b border-neutral-800 flex items-center ${collapsed ? 'justify-center' : 'space-x-3 justify-between'} text-cyan-400 transition-all h-16`}>
                             <div className="flex items-center space-x-3">
                                 <Terminal size={28} className="shrink-0" />
-                                {!collapsed && <span className="font-mono font-bold tracking-[0.2em] text-lg whitespace-nowrap">INV_SYS</span>}
+                                {!collapsed && <span className="font-mono font-bold tracking-[0.2em] text-lg whitespace-nowrap">Inventory App</span>}
                             </div>
                         </div>
-                        
+
                         <nav className="flex-1 overflow-y-auto py-4 overflow-x-hidden">
                             {navGroups.map((group, gIdx) => (
                                 <div key={gIdx} className="mb-6">
@@ -98,11 +104,10 @@ export default function MasterLayout({ children, title }) {
                                                     <Link
                                                         href={item.href}
                                                         title={collapsed ? item.name : undefined}
-                                                        className={`flex items-center ${collapsed ? 'justify-center px-0' : 'space-x-3 px-4'} py-3 font-mono text-sm uppercase tracking-wider transition-colors ${
-                                                            isActive 
-                                                                ? `bg-cyan-500/10 text-cyan-400 border-l-2 border-cyan-400` 
-                                                                : `text-neutral-400 border-l-2 border-transparent hover:bg-neutral-800 hover:text-neutral-200`
-                                                        }`}
+                                                        className={`flex items-center ${collapsed ? 'justify-center px-0' : 'space-x-3 px-4'} py-3 font-mono text-sm uppercase tracking-wider transition-colors ${isActive
+                                                            ? `bg-cyan-500/10 text-cyan-400 border-l-2 border-cyan-400`
+                                                            : `text-neutral-400 border-l-2 border-transparent hover:bg-neutral-800 hover:text-neutral-200`
+                                                            }`}
                                                     >
                                                         <Icon size={18} className={`shrink-0 ${isActive ? 'text-cyan-400' : 'text-neutral-500'}`} />
                                                         {!collapsed && <span className="whitespace-nowrap">{item.name}</span>}
@@ -114,13 +119,13 @@ export default function MasterLayout({ children, title }) {
                                 </div>
                             ))}
                         </nav>
-                        
+
                         <div className="p-4 border-t border-neutral-800 flex flex-col space-y-4">
                             <div className={`font-mono text-[10px] text-neutral-600 uppercase tracking-widest flex ${collapsed ? 'justify-center' : 'justify-between'}`}>
                                 {!collapsed && <span>Status</span>}
                                 <span className="text-cyan-600" title="Online">{collapsed ? 'ON' : 'Online'}</span>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => setCollapsed(!collapsed)}
                                 className="hidden md:flex items-center justify-center w-full py-2 bg-neutral-950 border border-neutral-800 text-neutral-400 hover:text-cyan-400 hover:border-cyan-500/50 transition-colors rounded-sm"
                             >
@@ -133,7 +138,7 @@ export default function MasterLayout({ children, title }) {
 
             {/* Overlay for mobile sidebar */}
             {sidebarOpen && (
-                <div 
+                <div
                     className="fixed inset-0 bg-neutral-950/80 z-30 md:hidden backdrop-blur-sm"
                     onClick={() => setSidebarOpen(false)}
                 />
@@ -148,9 +153,9 @@ export default function MasterLayout({ children, title }) {
                             {title || 'Dashboard'}
                         </h2>
                     </div>
-                    
+
                     <div className="flex items-center space-x-6">
-                        <button 
+                        <button
                             onClick={() => setShowPalette(true)}
                             className="flex items-center space-x-3 bg-neutral-950 border border-neutral-800 px-3 py-1.5 rounded-md text-neutral-500 hover:border-cyan-500/50 hover:text-cyan-400 transition-colors w-64"
                         >
@@ -158,7 +163,7 @@ export default function MasterLayout({ children, title }) {
                             <span className="font-mono text-xs flex-1 text-left">Search...</span>
                             <span className="font-mono text-[10px] border border-neutral-800 px-1 rounded bg-neutral-900">Ctrl K</span>
                         </button>
-                        
+
                         <div className="flex items-center space-x-4 border-l border-neutral-800 pl-6">
                             <button className="text-neutral-500 hover:text-cyan-400 transition-colors relative">
                                 <Bell size={18} />
@@ -166,11 +171,19 @@ export default function MasterLayout({ children, title }) {
                             </button>
                             <div className="flex items-center space-x-3 cursor-pointer group">
                                 <div className="text-right hidden lg:block">
-                                    <div className="font-mono text-xs text-neutral-300 font-bold group-hover:text-cyan-400 transition-colors">Admin_01</div>
-                                    <div className="font-mono text-[10px] text-cyan-600 uppercase tracking-widest">Administrator</div>
+                                    <div className="font-mono text-xs text-neutral-300 font-bold group-hover:text-cyan-400 transition-colors">{auth?.user?.name || 'Guest'}</div>
+                                    <div className="font-mono text-[10px] text-cyan-600 uppercase tracking-widest">{auth?.user?.role || 'User'}</div>
                                 </div>
                                 <UserCircle size={28} className="text-neutral-400 group-hover:text-cyan-400 transition-colors" />
                             </div>
+                            <Link
+                                href="/logout"
+                                method="post"
+                                className="text-neutral-500 hover:text-rose-400 transition-colors ml-4"
+                                title="Logout"
+                            >
+                                <LogOut size={18} />
+                            </Link>
                         </div>
                     </div>
                 </header>
